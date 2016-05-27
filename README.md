@@ -20,10 +20,19 @@ mpicc hw3.c -o hw3
 ```bash
 mpiexec -np 2 ./hw3 
 ```
+Array is NOT sorted
+9 8 7 6 5 4 3 2 1 0 
+Array is sorted
+Elapsed time MPI_Wtime is 9.431626
+
 **Execute with np = 4**
 ```bash
 mpiexec -np 4 ./hw3 
 ```
+Array is NOT sorted
+9 8 7 6 5 4 3 2 1 0 
+Array is sorted
+Elapsed time MPI_Wtime is 4.091237
 
 Homework 5
 ---------
@@ -57,7 +66,7 @@ Member Group 7
 Fullname | StudentID
 ------------ | -------------
 Supanut Apikulvanich | 5610501016
-Aphichan Chaiyuttasart | 5610502888
+Apichan Chaiyuttasart | 5610502888
 Manatsawin Hanmongkolchai | 5610545757
 Nut Kaewnak | 5610545676
 Piyaphat Tulakoop | 5610545731
