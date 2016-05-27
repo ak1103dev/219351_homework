@@ -20,19 +20,19 @@ mpicc hw3.c -o hw3
 ```bash
 mpiexec -np 2 ./hw3 
 ```
-Array is NOT sorted
-9 8 7 6 5 4 3 2 1 0 
-Array is sorted
-Elapsed time MPI_Wtime is 9.431626
+Array is NOT sorted<br>
+9 8 7 6 5 4 3 2 1 0 <br>
+Array is sorted<br>
+Elapsed time MPI_Wtime is 9.431626<br>
 
 **Execute with np = 4**
 ```bash
 mpiexec -np 4 ./hw3 
 ```
-Array is NOT sorted
-9 8 7 6 5 4 3 2 1 0 
-Array is sorted
-Elapsed time MPI_Wtime is 4.091237
+Array is NOT sorted<br>
+9 8 7 6 5 4 3 2 1 0 <br>
+Array is sorted<br>
+Elapsed time MPI_Wtime is 4.091237<br>
 
 Homework 5
 ---------
