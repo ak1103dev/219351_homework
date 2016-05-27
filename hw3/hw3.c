@@ -5,21 +5,6 @@
 
 #define N 100000
 
-void swap(int *xp, int *yp) {
-  int temp = *xp;
-  *xp = *yp;
-  *yp = temp;
-}
-
-// A function to implement bubble sort
-void bubbleSort(int arr[], int n) {
-  int i, j;
-  for (i = 0; i < n-1; i++)
-    for (j = 0; j < n-i-1; j++)
-      if (arr[j] > arr[j+1])
-		swap(&arr[j], &arr[j+1]);
-}
-
 int * merge(int *v1, int n1, int *v2, int n2)
 {
 	int i,j,k;
@@ -59,6 +44,21 @@ int * merge(int *v1, int n1, int *v2, int n2)
 	return result;
 }
 
+void swap(int *xp, int *yp) {
+  int temp = *xp;
+  *xp = *yp;
+  *yp = temp;
+}
+
+// A function to implement bubble sort
+void bubbleSort(int arr[], int n) {
+  int i, j;
+  for (i = 0; i < n-1; i++)
+    for (j = 0; j < n-i-1; j++)
+      if (arr[j] > arr[j+1])
+		swap(&arr[j], &arr[j+1]);
+}
+
 int isSorted(int *a, int size) {
   int i;
   for (i = 0; i < size - 1; i++) {
@@ -80,52 +80,58 @@ void printArray(int arr[], int size)
 
 
 int main(int argc, char** argv) {
-	int * data;
-	int * chunk;
-	int * other;
-	int m,n=N;
-	int id,p;
-	int s;
 	int i;
+	int* A;
+	int* chunk;
+	int* other;
+	clock_t start, end;
+	double elapsed_time, t1, t2;
+
 	int step;
+	int m;
 	MPI_Status status;
 
+	int id, p;
 	MPI_Init(&argc,&argv);
 	MPI_Comm_rank(MPI_COMM_WORLD,&id);
 	MPI_Comm_size(MPI_COMM_WORLD,&p);
 
-	clock_t start, end;
-	double elapsed_time, t1, t2;
+	int s;
 
-	if(id==0)
-	{
+	if(id == 0) {
 		int r;
-		srandom(clock());
-		s = n/p;
-		r = n%p;
-		data = (int *)malloc((n+p-r)*sizeof(int));
-		for(i=0;i<n;i++)
-			data[i] = random();
-		if(r!=0)
-		{
-			for(i=n;i<n+p-r;i++)
-  			   data[i]=0;
+		s = N/p;
+		r = N%p;
+		t1 = MPI_Wtime();
+		A = (int *)malloc(sizeof(int)*N);
+		if (A == NULL) {
+			printf("Fail to malloc\n");
+			exit(0);
+		}
+		for (i=N-1; i>=0; i--)
+			A[N-1-i] = i;
+		if(r != 0) {
+			for(i = N; i < N+p-r; i++)
+				A[i] = 0;
 			s=s+1;
 		}
 
-		start = clock();
-
 		MPI_Bcast(&s,1,MPI_INT,0,MPI_COMM_WORLD);
 		chunk = (int *)malloc(s*sizeof(int));
-		MPI_Scatter(data,s,MPI_INT,chunk,s,MPI_INT,0,MPI_COMM_WORLD);
+		MPI_Scatter(A,s,MPI_INT,chunk,s,MPI_INT,0,MPI_COMM_WORLD);
+
+		if (isSorted(A, N))
+		  printf("Array is sorted\n");
+		else
+		  printf("Array is NOT sorted\n");
 
 		bubbleSort(chunk,s);
+		printArray(&A[N-10], 10);
 	}
-	else
-	{
+	else {
 		MPI_Bcast(&s,1,MPI_INT,0,MPI_COMM_WORLD);
 		chunk = (int *)malloc(s*sizeof(int));
-		MPI_Scatter(data,s,MPI_INT,chunk,s,MPI_INT,0,MPI_COMM_WORLD);
+		MPI_Scatter(A,s,MPI_INT,chunk,s,MPI_INT,0,MPI_COMM_WORLD);
 
 		bubbleSort(chunk,s);
 	}
@@ -155,16 +161,13 @@ int main(int argc, char** argv) {
 	}
 	if(id==0)
 	{
-		FILE * fout;
+		if (isSorted(chunk, N))
+		  printf("Array is sorted\n");
+		else
+		  printf("Array is NOT sorted\n");
 
-		end = clock();
-		printf("%d; %d processors; %f secs\n",N,p,(end-start)/CLOCKS_PER_SEC);
-
-		fout = fopen("result","w");
-		for(i=0;i<s;i++)
-		   if (chunk[i] != 0)
-			fprintf(fout,"%d\n",chunk[i]);
-		fclose(fout);
+		t2 = MPI_Wtime();
+		printf( "Elapsed time MPI_Wtime is %f\n", t2 - t1 );
 	}
 	MPI_Finalize();
 	return 0;
